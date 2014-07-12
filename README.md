@@ -4,6 +4,12 @@ This project integrates the [Rajawali 3D framework](https://github.com/MasDennis
 
 [https://www.youtube.com/watch?v=3L0l_jmkcBE&feature=youtu.be](https://www.youtube.com/watch?v=3L0l_jmkcBE&feature=youtu.be)
 
+## Virtual Reality Headset
+
+You'll need a virtual reality headset for smartphones:
+- [Durovis Dive](http://www.durovis.com/index.html)
+- [Cardboard](http://www.googlecardboard.com/)
+
 ## Setup
 
 1. Clone or download a copy of the Rajawali source code.
