@@ -13,14 +13,15 @@ public class RajawaliVRRenderer extends RajawaliSideBySideRenderer {
 	protected HeadTransform mHeadTransform;
 	protected float[] mHeadViewMatrix;
 	protected Matrix4 mHeadViewMatrix4;
-	private Quaternion mCameraOrientation;
+	protected Quaternion cam1, cam2;
 	
 	public RajawaliVRRenderer(Context context) {
 		super(context);
 		mHeadTransform = new HeadTransform();
 		mHeadViewMatrix = new float[16];
 		mHeadViewMatrix4 = new Matrix4();
-		mCameraOrientation = new Quaternion();
+		cam1 = new Quaternion();
+		cam2 = new Quaternion();
 	}
 	
 	@Override
@@ -38,11 +39,13 @@ public class RajawaliVRRenderer extends RajawaliSideBySideRenderer {
 		mHeadTracker.getLastHeadView(mHeadViewMatrix, 0);
 		mHeadViewMatrix4.setAll(mHeadViewMatrix);
 		
-		mCameraOrientation.fromMatrix(mHeadViewMatrix4);
-		mCameraOrientation.x *= -1;
-		mCameraOrientation.y *= -1;
-		mCameraOrientation.z *= -1;
-		setCameraOrientation(mCameraOrientation);
+		cam1.fromMatrix(mHeadViewMatrix4);
+		cam1.x *= -1;
+		cam1.y *= -1;
+		cam1.z *= -1;
+
+		cam2.slerp(cam1, .3);
+		setCameraOrientation(cam2);
 		super.onRender(deltaTime);
 	}
 }
