@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="rajawalivr-1.0.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/org.rajawali3d.vr/rajawalivr/1.0.0-SNAPSHOT/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/org.rajawali3d.vr/rajawalivr/1.0.0-SNAPSHOT/libs/cardboard.jar!/" />
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/org.rajawali3d.vr/rajawalivr/1.0.0-SNAPSHOT/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

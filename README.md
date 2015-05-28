@@ -10,13 +10,21 @@ You'll need a virtual reality headset for smartphones:
 - [Durovis Dive](http://www.durovis.com/index.html)
 - [Cardboard](http://www.googlecardboard.com/)
 
-## Setup
+#How To Run The Example
 
-1. Clone or download a copy of the Rajawali source code.
-2. Clone or download a copy of the RajawaliVR source code.
-3. Import the Rajawali project into Eclipse.
-4. In your project's settings, [add a library reference](https://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject) to Rajawali.
-5. In your project's settings, [add a library reference](https://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject) to RajawaliVR.
+You need a local build of the latest RajawaliVR Framework. Currently RajawaliVR is not available on maven so a local build must be created. To build a local release of RajawaliVR simply perform a checkout of the library then run the gradle tasks ```clean assembleRelease uploadArchives```.
+
+## Linux
+```
+git clone https://github.com/Rajawali/RajawaliVR.git
+./RajawaliVR/RajawaliVR/gradlew clean assembleRelease uploadArchives
+```
+
+## Windows
+```
+git clone https://github.com/Rajawali/RajawaliVE.git
+./RajawaliVR/RajawaliVR/gradlew.bat clean assembleRelease uploadArchives
+```
 
 ![Rajawali + Virtual Reality](http://www.rozengain.com/files/rajawali/rajawali-virtual-reality-001.jpg)
 ![Rajawali + Virtual Reality](http://www.rozengain.com/files/rajawali/rajawali-virtual-reality-002.jpg)
