@@ -17,6 +17,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.opengl.GLES20;
 
+import org.rajawali3d.Object3D;
 import org.rajawali3d.cameras.Camera;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture.TextureException;
@@ -139,23 +140,25 @@ public abstract class RajawaliSideBySideRenderer extends RajawaliRenderer {
 	/**
 	 * This screen quad will contain the scene as viewed from the left eye.
 	 */
-	private ScreenQuad mLeftQuad;
+//	private Object3D mLeftQuad;
 	/**
 	 * This screen quad will contain the scene as viewed from the right eye.
 	 */
-	private ScreenQuad mRightQuad;
+//	private Object3D mRightQuad;
 	/**
 	 * The material for the left quad
 	 */
-	private Material mLeftQuadMaterial;
+//	private Material mLeftQuadMaterial;
 	/**
 	 * The material for the right quad
 	 */
-	private Material mRightQuadMaterial;
+//	private Material mRightQuadMaterial;
 	/**
 	 * The distance between the pupils. This is used to offset the cameras.
 	 */
 	private double mPupilDistance = .06;
+    private Object3D mLeftMesh;
+    private Object3D mRightMesh;
 
 	public RajawaliSideBySideRenderer(Context context)
 	{
@@ -184,30 +187,30 @@ public abstract class RajawaliSideBySideRenderer extends RajawaliRenderer {
 		
 		setPupilDistance(mPupilDistance);
 
-		mLeftQuadMaterial = new Material();
-		mLeftQuadMaterial.setColorInfluence(0);
-		mRightQuadMaterial = new Material();
-		mRightQuadMaterial.setColorInfluence(0);
+//		mLeftQuadMaterial = new Material();
+//		mLeftQuadMaterial.setColorInfluence(0);
+//		mRightQuadMaterial = new Material();
+//		mRightQuadMaterial.setColorInfluence(0);
 
 		mSideBySideScene = new RajawaliScene(this);
 
-		mLeftQuad = new ScreenQuad();
-		mLeftQuad.setScaleX(.5);
-		mLeftQuad.setX(-.25);
-		mLeftQuad.setMaterial(mLeftQuadMaterial);
-		mSideBySideScene.addChild(mLeftQuad);
+//		mLeftQuad = new ScreenQuad();
+//		mLeftQuad.setScaleX(.5);
+//		mLeftQuad.setX(-.25);
+//		mLeftQuad.setMaterial(mLeftQuadMaterial);
+		mSideBySideScene.addChild(mLeftMesh);
 
-		mRightQuad = new ScreenQuad();
-		mRightQuad.setScaleX(.5);
-		mRightQuad.setX(.25);
-		mRightQuad.setMaterial(mRightQuadMaterial);
-		mSideBySideScene.addChild(mRightQuad);
+//		mRightQuad = new ScreenQuad();
+//		mRightQuad.setScaleX(.5);
+//		mRightQuad.setX(.25);
+//		mRightQuad.setMaterial(mRightQuadMaterial);
+		mSideBySideScene.addChild(mRightMesh);
 
 		addScene(mSideBySideScene);
 
 		mViewportWidthHalf = (int) (mDefaultViewportWidth * .5f);
 
-		mLeftRenderTarget = new RenderTarget("sbsLeftRT", mViewportWidthHalf, mDefaultViewportHeight);
+		mLeftRenderTarget = new RenderTarget("uDistortionTexture", mViewportWidthHalf, mDefaultViewportHeight);
 		mLeftRenderTarget.setFullscreen(false);
 		mRightRenderTarget = new RenderTarget("sbsRightRT", mViewportWidthHalf, mDefaultViewportHeight);
 		mRightRenderTarget.setFullscreen(false);
@@ -219,8 +222,8 @@ public abstract class RajawaliSideBySideRenderer extends RajawaliRenderer {
 		addRenderTarget(mRightRenderTarget);
 
 		try {
-			mLeftQuadMaterial.addTexture(mLeftRenderTarget.getTexture());
-			mRightQuadMaterial.addTexture(mRightRenderTarget.getTexture());
+			mLeftMesh.getMaterial().addTexture(mLeftRenderTarget.getTexture());
+			mRightMesh.getMaterial().addTexture(mRightRenderTarget.getTexture());
 		} catch (TextureException e) {
 			e.printStackTrace();
 		}
@@ -294,4 +297,12 @@ public abstract class RajawaliSideBySideRenderer extends RajawaliRenderer {
 	{
 		return mPupilDistance;
 	}
+
+    public void setLeftMesh(Object3D leftMesh) {
+        mLeftMesh = leftMesh;
+    }
+
+    public void setRightMesh(Object3D rightMesh) {
+        mRightMesh = rightMesh;
+    }
 }

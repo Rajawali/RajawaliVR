@@ -14,6 +14,7 @@ public class RajawaliVRRenderer extends RajawaliSideBySideRenderer {
 	protected float[] mHeadViewMatrix;
 	protected Matrix4 mHeadViewMatrix4;
 	private Quaternion mCameraOrientation;
+    private DistortionMeshManager mDistortionMeshManager;
 	
 	public RajawaliVRRenderer(Context context) {
 		super(context);
@@ -25,6 +26,9 @@ public class RajawaliVRRenderer extends RajawaliSideBySideRenderer {
 	
 	@Override
 	public void initScene() {
+        mDistortionMeshManager = new DistortionMeshManager();
+        setLeftMesh(mDistortionMeshManager.getLeftEyeDistortionMesh());
+        setRightMesh(mDistortionMeshManager.getRightEyeDistortionMesh());
 		super.initScene();
 	}
 	
