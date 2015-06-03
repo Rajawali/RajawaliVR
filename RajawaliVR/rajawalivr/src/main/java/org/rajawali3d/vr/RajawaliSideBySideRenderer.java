@@ -294,4 +294,12 @@ public abstract class RajawaliSideBySideRenderer extends RajawaliRenderer {
 	{
 		return mPupilDistance;
 	}
+
+    public Camera getLeftCamera() {
+        return mCameraLeft;
+    }
+
+    public Camera getRightCamera() {
+        return mCameraRight;
+    }
 }

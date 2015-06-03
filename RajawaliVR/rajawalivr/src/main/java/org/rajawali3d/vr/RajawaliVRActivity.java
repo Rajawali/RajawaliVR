@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Display;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -50,6 +51,10 @@ public class RajawaliVRActivity extends Activity {
 		renderer.setHeadTracker(mHeadTracker);
         mSurfaceView.setSurfaceRenderer(renderer);
 	}
+
+    public RajawaliSurfaceView getSurfaceView() {
+        return mSurfaceView;
+    }
 	
 	@Override
 	public void onResume() {
