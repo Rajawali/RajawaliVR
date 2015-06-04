@@ -32,9 +32,7 @@ public class RajawaliVRActivity extends CardboardActivity {
 	            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
 	            | View.SYSTEM_UI_FLAG_IMMERSIVE);
 
-        SensorManager sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-
-        Display display = ((WindowManager)getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+        setCardboardView(mSurfaceView);
 	}
 	
 	protected void setRenderer(RajawaliVRRenderer renderer) {

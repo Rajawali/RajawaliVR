@@ -1,32 +1,31 @@
 package org.rajawali3d.vr.example;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation.RepeatMode;
 import org.rajawali3d.animation.SplineTranslateAnimation3D;
 import org.rajawali3d.curves.CatmullRomCurve3D;
 import org.rajawali3d.lights.DirectionalLight;
+import org.rajawali3d.loader.LoaderAWD;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture.TextureException;
 import org.rajawali3d.materials.textures.NormalMapTexture;
 import org.rajawali3d.materials.textures.Texture;
-import org.rajawali3d.math.Matrix4;
-import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.loader.LoaderAWD;
+import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.terrain.SquareTerrain;
 import org.rajawali3d.terrain.TerrainGenerator;
 import org.rajawali3d.util.RajLog;
 import org.rajawali3d.vr.renderer.RajawaliVRRenderer;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
-import com.google.vrtoolkit.cardboard.Eye;
-
 public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
     private SquareTerrain mTerrain;
+    private Sphere mLookatSphere;
 
     public RajawaliVRExampleRenderer(Context context) {
         super(context);
@@ -34,7 +33,6 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
 
     @Override
     public void initScene() {
-        RajLog.i("initScene");
         DirectionalLight light = new DirectionalLight(0.2f, -1f, 0f);
         light.setPower(.7f);
         getCurrentScene().addLight(light);
@@ -42,7 +40,6 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
         light = new DirectionalLight(0.2f, 1f, 0f);
         light.setPower(1f);
         getCurrentScene().addLight(light);
-
 
         getCurrentCamera().setFarPlane(1000);
 
@@ -137,6 +134,15 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
             e.printStackTrace();
         }
 
+        mLookatSphere = new Sphere(1, 12, 12);
+        Material sphereMaterial = new Material();
+        sphereMaterial.setDiffuseMethod(new DiffuseMethod.Lambert());
+        sphereMaterial.enableLighting(true);
+        mLookatSphere.setMaterial(sphereMaterial);
+        mLookatSphere.setColor(Color.YELLOW);
+        mLookatSphere.setPosition(0, 0, -6);
+        getCurrentScene().addChild(mLookatSphere);
+
         super.initScene();
     }
 
@@ -205,26 +211,17 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
         mTerrain.setY(-100);
         mTerrain.setMaterial(material);
 
-//        getCurrentScene().alwaysClearColorBuffer(false);
         getCurrentScene().addChild(mTerrain);
     }
 
     @Override
     public void onRender(long elapsedTime, double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-        RajLog.i("onRender");
-    }
-
-    @Override
-    public void onDrawEye(Eye eye) {
-        Matrix4 m = new Matrix4();
-        m.setAll(eye.getEyeView());
-
-        Quaternion q = new Quaternion();
-        q.fromMatrix(m);
-
-        getCurrentCamera().setOrientation(q);
-
-        super.onDrawEye(eye);
+        boolean isLookingAt = isLookingAtObject(mLookatSphere);
+        if(isLookingAt) {
+            mLookatSphere.setColor(Color.RED);
+        } else {
+            mLookatSphere.setColor(Color.YELLOW);
+        }
     }
 }
