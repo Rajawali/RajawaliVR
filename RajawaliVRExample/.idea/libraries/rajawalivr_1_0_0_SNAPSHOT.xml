@@ -4,6 +4,7 @@
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/org.rajawali3d.vr/rajawalivr/1.0.0-SNAPSHOT/classes.jar!/" />
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/org.rajawali3d.vr/rajawalivr/1.0.0-SNAPSHOT/libs/cardboard.jar!/" />
       <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/org.rajawali3d.vr/rajawalivr/1.0.0-SNAPSHOT/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/org.rajawali3d.vr/rajawalivr/1.0.0-SNAPSHOT/libs/libprotobuf-java-2.6-nano.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
