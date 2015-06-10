@@ -22,8 +22,7 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
 
 public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardView.StereoRenderer {
-    private static final float YAW_LIMIT = 0.12f;
-    private static final float PITCH_LIMIT = 0.12f;
+    private static final float MAX_LOOKAT_ANGLE = 10;
 
     protected Matrix4 mCurrentEyeMatrix;
     protected Matrix4 mHeadViewMatrix;
@@ -95,17 +94,18 @@ public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardVie
     }
 
     public boolean isLookingAtObject(Object3D target) {
-        return this.isLookingAtObject(target, PITCH_LIMIT, YAW_LIMIT);
+        return this.isLookingAtObject(target, MAX_LOOKAT_ANGLE);
     }
 
-    public boolean isLookingAtObject(Object3D target, float pitchLimit, float yawLimit) {
-        mLookingAtMatrix.setAll(target.getModelViewMatrix());
+    public boolean isLookingAtObject(Object3D target, float maxAngle) {
+        Quaternion o = getCurrentCamera().getOrientation().invertAndCreate();
         Vector3 forward = new Vector3(0, 0, 1);
-        forward.multiply(mLookingAtMatrix);
+        forward.transform(o);
 
-        float pitch = (float) Math.atan2(forward.y, -forward.z);
-        float yaw = (float) Math.atan2(forward.x, -forward.z);
+        Vector3 pos = getCurrentCamera().getPosition().clone();
+        pos.subtract(target.getPosition());
+        pos.normalize();
 
-        return Math.abs(pitch) < pitchLimit && Math.abs(yaw) < yawLimit;
+        return pos.angle(forward) < maxAngle;
     }
 }
