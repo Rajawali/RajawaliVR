@@ -1,1 +1,1 @@
-project.ext.set('depRajawali', 'org.rajawali3d:rajawali:1.0.266-SNAPSHOT@aar')
+project.ext.set('depRajawali', 'org.rajawali3d:rajawali:1.0.273-SNAPSHOT@aar')
