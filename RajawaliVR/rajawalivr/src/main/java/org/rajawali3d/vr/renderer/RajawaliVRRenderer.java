@@ -67,6 +67,11 @@ public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardVie
 
     @Override
     public void onDrawEye(Eye eye) {
+        getCurrentCamera().updatePerspective(
+                eye.getFov().getLeft(),
+                eye.getFov().getRight(),
+                eye.getFov().getBottom(),
+                eye.getFov().getTop());
         mCurrentEyeMatrix.setAll(eye.getEyeView());
         mCurrentEyeOrientation.fromMatrix(mCurrentEyeMatrix);
         getCurrentCamera().setOrientation(mCurrentEyeOrientation);
