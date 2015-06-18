@@ -1,3 +1,16 @@
+/**
+ * Copyright 2015 Dennis Ippel
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+
 package org.rajawali3d.vr.renderer;
 
 import android.content.Context;
@@ -21,12 +34,16 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
 
+/**
+ * @author dennis.ippel
+ */
 public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardView.StereoRenderer {
     private static final float MAX_LOOKAT_ANGLE = 10;
 
     protected Matrix4 mCurrentEyeMatrix;
     protected Matrix4 mHeadViewMatrix;
     protected Quaternion mCurrentEyeOrientation;
+    protected Vector3 mCameraPosition;
 
     private Matrix4 mLookingAtMatrix;
     private float[] mHeadView;
@@ -38,6 +55,7 @@ public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardVie
         mLookingAtMatrix = new Matrix4();
         mCurrentEyeOrientation = new Quaternion();
         mHeadView = new float[16];
+        mCameraPosition = new Vector3();
 	}
 	
 	@Override
@@ -75,6 +93,8 @@ public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardVie
         mCurrentEyeMatrix.setAll(eye.getEyeView());
         mCurrentEyeOrientation.fromMatrix(mCurrentEyeMatrix);
         getCurrentCamera().setOrientation(mCurrentEyeOrientation);
+        getCurrentCamera().setPosition(mCameraPosition);
+        getCurrentCamera().getPosition().add(mCurrentEyeMatrix.getTranslation());
         super.onRenderFrame(null);
     }
 
