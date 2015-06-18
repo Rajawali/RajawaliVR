@@ -14,7 +14,6 @@
 package org.rajawali3d.vr.renderer;
 
 import android.content.Context;
-import android.opengl.Matrix;
 import android.view.MotionEvent;
 
 import com.google.vrtoolkit.cardboard.CardboardView;
@@ -27,12 +26,8 @@ import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.renderer.RajawaliRenderer;
-import org.rajawali3d.util.RajLog;
 
-import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.opengles.GL10;
 
 /**
  * @author dennis.ippel
@@ -43,7 +38,11 @@ public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardVie
     protected Matrix4 mCurrentEyeMatrix;
     protected Matrix4 mHeadViewMatrix;
     protected Quaternion mCurrentEyeOrientation;
+    protected Quaternion mHeadViewQuaternion;
     protected Vector3 mCameraPosition;
+    private Vector3 mForwardVec;
+    private Vector3 mHeadTranslation;
+
 
     private Matrix4 mLookingAtMatrix;
     private float[] mHeadView;
@@ -54,8 +53,11 @@ public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardVie
         mHeadViewMatrix = new Matrix4();
         mLookingAtMatrix = new Matrix4();
         mCurrentEyeOrientation = new Quaternion();
+        mHeadViewQuaternion = new Quaternion();
         mHeadView = new float[16];
         mCameraPosition = new Vector3();
+        mForwardVec = new Vector3();
+        mHeadTranslation = new Vector3();
 	}
 	
 	@Override
@@ -81,6 +83,7 @@ public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardVie
     @Override
     public void onNewFrame(HeadTransform headTransform) {
         headTransform.getHeadView(mHeadView, 0);
+        mHeadViewMatrix.setAll(mHeadView);
     }
 
     @Override
@@ -94,7 +97,7 @@ public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardVie
         mCurrentEyeOrientation.fromMatrix(mCurrentEyeMatrix);
         getCurrentCamera().setOrientation(mCurrentEyeOrientation);
         getCurrentCamera().setPosition(mCameraPosition);
-        getCurrentCamera().getPosition().add(mCurrentEyeMatrix.getTranslation());
+        getCurrentCamera().getPosition().add(mCurrentEyeMatrix.getTranslation().inverse());
         super.onRenderFrame(null);
     }
 
@@ -123,14 +126,15 @@ public class RajawaliVRRenderer extends RajawaliRenderer implements CardboardVie
     }
 
     public boolean isLookingAtObject(Object3D target, float maxAngle) {
-        Quaternion o = getCurrentCamera().getOrientation().invertAndCreate();
-        Vector3 forward = new Vector3(0, 0, 1);
-        forward.transform(o);
+        mHeadViewQuaternion.fromMatrix(mHeadViewMatrix);
+        mHeadViewQuaternion.inverse();
+        mForwardVec.setAll(0, 0, 1);
+        mForwardVec.transform(mHeadViewQuaternion);
 
-        Vector3 pos = getCurrentCamera().getPosition().clone();
-        pos.subtract(target.getPosition());
-        pos.normalize();
+        mHeadTranslation.setAll(mHeadViewMatrix.getTranslation());
+        mHeadTranslation.subtract(target.getPosition());
+        mHeadTranslation.normalize();
 
-        return pos.angle(forward) < maxAngle;
+        return mHeadTranslation.angle(mForwardVec) < maxAngle;
     }
 }
