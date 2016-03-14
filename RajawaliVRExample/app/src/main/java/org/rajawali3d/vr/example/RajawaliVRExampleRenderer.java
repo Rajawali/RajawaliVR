@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 
+import com.google.vrtoolkit.cardboard.audio.CardboardAudioEngine;
+
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation.RepeatMode;
 import org.rajawali3d.animation.SplineTranslateAnimation3D;
@@ -20,12 +22,15 @@ import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.terrain.SquareTerrain;
 import org.rajawali3d.terrain.TerrainGenerator;
-import org.rajawali3d.util.RajLog;
 import org.rajawali3d.vr.renderer.RajawaliVRRenderer;
 
 public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
-    private SquareTerrain mTerrain;
-    private Sphere mLookatSphere;
+    private SquareTerrain terrain;
+    private Sphere lookatSphere;
+    private Object3D capital;
+    private CardboardAudioEngine cardboardAudioEngine;
+    private volatile int spaceShipSoundId = CardboardAudioEngine.INVALID_ID;
+    private volatile int sonarSoundId = CardboardAudioEngine.INVALID_ID;
 
     public RajawaliVRExampleRenderer(Context context) {
         super(context);
@@ -50,7 +55,7 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
         try {
             getCurrentScene().setSkybox(R.drawable.posx, R.drawable.negx, R.drawable.posy, R.drawable.negy, R.drawable.posz, R.drawable.negz);
 
-            LoaderAWD loader = new LoaderAWD(mContext.getResources(), mTextureManager, R.raw.space_cruiser);
+            LoaderAWD loader = new LoaderAWD(getContext().getResources(), getTextureManager(), R.raw.space_cruiser);
             loader.parse();
 
             Material cruiserMaterial = new Material();
@@ -71,7 +76,7 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
             spaceCruiser.setRotY(180);
             getCurrentScene().addChild(spaceCruiser);
 
-            loader = new LoaderAWD(mContext.getResources(), mTextureManager, R.raw.dark_fighter);
+            loader = new LoaderAWD(getContext().getResources(), getTextureManager(), R.raw.dark_fighter);
             loader.parse();
 
             Material darkFighterMaterial = new Material();
@@ -101,7 +106,7 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
             getCurrentScene().registerAnimation(anim);
             anim.play();
 
-            loader = new LoaderAWD(mContext.getResources(), mTextureManager, R.raw.capital);
+            loader = new LoaderAWD(getContext().getResources(), getTextureManager(), R.raw.capital);
             loader.parse();
 
             Material capitalMaterial = new Material();
@@ -111,7 +116,7 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
             capitalMaterial.addTexture(new Texture("capitalTex", R.drawable.hullw));
             capitalMaterial.addTexture(new NormalMapTexture("capitalNormTex", R.drawable.hulln));
 
-            Object3D capital = loader.getParsedObject();
+            capital = loader.getParsedObject();
             capital.setMaterial(capitalMaterial);
             capital.setScale(18);
             getCurrentScene().addChild(capital);
@@ -134,16 +139,55 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
             e.printStackTrace();
         }
 
-        mLookatSphere = new Sphere(1, 12, 12);
+        lookatSphere = new Sphere(1, 12, 12);
         Material sphereMaterial = new Material();
         sphereMaterial.setDiffuseMethod(new DiffuseMethod.Lambert());
         sphereMaterial.enableLighting(true);
-        mLookatSphere.setMaterial(sphereMaterial);
-        mLookatSphere.setColor(Color.YELLOW);
-        mLookatSphere.setPosition(0, 0, -6);
-        getCurrentScene().addChild(mLookatSphere);
+        lookatSphere.setMaterial(sphereMaterial);
+        lookatSphere.setColor(Color.YELLOW);
+        lookatSphere.setPosition(0, 0, -6);
+        getCurrentScene().addChild(lookatSphere);
+
+        initAudio();
 
         super.initScene();
+    }
+
+    private void initAudio() {
+        cardboardAudioEngine =
+                new CardboardAudioEngine(getContext().getAssets(), CardboardAudioEngine.RenderingQuality.HIGH);
+
+        new Thread(
+                new Runnable() {
+                    public void run() {
+                        cardboardAudioEngine.preloadSoundFile("spaceship.wav");
+                        spaceShipSoundId = cardboardAudioEngine.createSoundObject("spaceship.wav");
+                        cardboardAudioEngine.setSoundObjectPosition(
+                                spaceShipSoundId, (float)capital.getX(), (float)capital.getY(), (float)capital.getZ()
+                        );
+                        cardboardAudioEngine.playSound(spaceShipSoundId, true);
+
+                        cardboardAudioEngine.preloadSoundFile("sonar.wav");
+                        sonarSoundId = cardboardAudioEngine.createSoundObject("sonar.wav");
+                        cardboardAudioEngine.setSoundObjectPosition(
+                                sonarSoundId, (float) lookatSphere.getX(), (float) lookatSphere.getY(), (float) lookatSphere.getZ()
+                        );
+                        cardboardAudioEngine.playSound(sonarSoundId, true);
+                    }
+                })
+                .start();
+    }
+
+    public void pauseAudio() {
+        if(cardboardAudioEngine != null) {
+            cardboardAudioEngine.pause();
+        }
+    }
+
+    public void resumeAudio() {
+        if(cardboardAudioEngine != null) {
+            cardboardAudioEngine.resume();
+        }
     }
 
     public void createTerrain() {
@@ -152,7 +196,7 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
         //    be used to generate heights.
         //
 
-        Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(),
+        Bitmap bmp = BitmapFactory.decodeResource(getContext().getResources(),
                 R.drawable.terrain);
 
         try {
@@ -177,7 +221,7 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
             //
             // -- create the terrain
             //
-            mTerrain = TerrainGenerator.createSquareTerrainFromBitmap(terrainParams, true);
+            terrain = TerrainGenerator.createSquareTerrainFromBitmap(terrainParams, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -208,20 +252,33 @@ public class RajawaliVRExampleRenderer extends RajawaliVRRenderer {
         // -- Blend the texture with the vertex colors
         //
         material.setColorInfluence(.5f);
-        mTerrain.setY(-100);
-        mTerrain.setMaterial(material);
+        terrain.setY(-100);
+        terrain.setMaterial(material);
 
-        getCurrentScene().addChild(mTerrain);
+        getCurrentScene().addChild(terrain);
     }
 
     @Override
     public void onRender(long elapsedTime, double deltaTime) {
         super.onRender(elapsedTime, deltaTime);
-        boolean isLookingAt = isLookingAtObject(mLookatSphere);
+        boolean isLookingAt = isLookingAtObject(lookatSphere);
         if(isLookingAt) {
-            mLookatSphere.setColor(Color.RED);
+            lookatSphere.setColor(Color.RED);
         } else {
-            mLookatSphere.setColor(Color.YELLOW);
+            lookatSphere.setColor(Color.YELLOW);
         }
+
+        if(spaceShipSoundId != CardboardAudioEngine.INVALID_ID) {
+            cardboardAudioEngine.setSoundObjectPosition(
+                    spaceShipSoundId, (float) capital.getX(), (float) capital.getY(), (float) capital.getZ());
+        }
+        if(sonarSoundId != CardboardAudioEngine.INVALID_ID) {
+            cardboardAudioEngine.setSoundObjectPosition(
+                    sonarSoundId, (float) lookatSphere.getX(), (float) lookatSphere.getY(), (float) lookatSphere.getZ()
+            );
+        }
+
+        cardboardAudioEngine.setHeadRotation(
+                (float)mHeadViewQuaternion.x, (float)mHeadViewQuaternion.y, (float)mHeadViewQuaternion.z, (float)mHeadViewQuaternion.w);
     }
 }

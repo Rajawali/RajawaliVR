@@ -36,4 +36,16 @@ public class RajawaliVRExampleActivity extends RajawaliVRActivity {
     public void onCardboardTrigger() {
         RajLog.i("onCardboardTrigger");
     }
+
+    @Override
+    public void onPause() {
+        mRenderer.pauseAudio();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mRenderer.resumeAudio();
+    }
 }

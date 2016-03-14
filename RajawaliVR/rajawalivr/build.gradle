@@ -20,12 +20,28 @@ android {
             status = 'release'
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDir new File(buildDir, 'native-libs')
+        }
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project.depRajawali
-    compile 'com.android.support:appcompat-v7:22.1.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
 }
+
+task copyNativeLibs(type: Copy) {
+    from(new File(project(':rajawalivr').getProjectDir(), 'libs')) { include '**/*.so' }
+    into new File(buildDir, 'native-libs')
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn copyNativeLibs
+}
+
+clean.dependsOn 'cleanCopyNativeLibs'
 
 apply from: 'maven_push.gradle'
