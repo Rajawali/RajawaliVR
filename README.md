@@ -1,7 +1,9 @@
 ## Rajawali + Virtual Reality
 
 ## ATTENTION
+
 As of 03/17/2016, this template is fully integrated to the examples application which has been moved to the main Rajawali repository: https://github.com/Rajawali/Rajawali. This repository will remain for historical reference but **it is effectively abandoned and no responses from the maintainers should be expected.**
+
 ==============================================================
 
 This project integrates the [Rajawali 3D framework](https://github.com/MasDennis/Rajawali) with the [Google Cardboard SDK v0.6.0](https://developers.google.com/cardboard/).
